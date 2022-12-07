@@ -1,0 +1,81 @@
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
+// Get the width and height of the screen
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
+const ImageCategorizationGame = () => {
+  // Keep track of the current image and the user's score
+  const [currentImage, setCurrentImage] = useState(null);
+  const [score, setScore] = useState(0);
+
+  // This function is called when the user categorizes an image
+  const categorizeImage = (category) => {
+    // Check if the user's categorization is correct using TensorFlow and PyTorch
+    if (category === currentImage.correctCategory) {
+      setScore(score + 1); // Increment the score by 1 if the categorization is correct
+    }
+
+    // Load the next image
+    setCurrentImage(getNextImage());
+  };
+
+  // This function is used to load the next image from a database or API
+  const getNextImage = () => {
+    return {
+      imageUrl: 'https://example.com/image.jpg',
+      correctCategory: 'metal'
+    };
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* Display the user's score */}
+      <Text style={styles.scoreText}>Score: {score}</Text>
+
+      {/* If there is a current image, display it */}
+      {currentImage && (
+        <Image
+          source={{ uri: currentImage.imageUrl }}
+          style={styles.image}
+          resizeMode="contain"
+        />
+      )}
+
+      {/*
+        This is the button container that holds the buttons
+        for the different image categories
+      */}
+      <View style={styles.buttonContainer}>
+        {/*
+          This is the button for the "metal" category.
+          When it's pressed, the categorizeImage() function
+          is called with the "metal" category as the argument.
+        */}
+        <TouchableOpacity
+          onPress={() => categorizeImage('metal')}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Swipe Right for Metal</Text>
+        </TouchableOpacity>
+
+        {/*
+          This is the button for the "plastic" category.
+          When it's pressed, the categorizeImage() function
+          is called with the "plastic" category as the argument.
+        */}
+        <TouchableOpacity
+          onPress={() => categorizeImage('plastic')}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Swipe Left for Plastic</Text>
+        </TouchableOpacity>
+
+        {/*
+          This is the button for the "cardboard" category.
+          When it's pressed, the categorizeImage() function
+          is called with the "cardboard" category as the argument.
+        */}
+
