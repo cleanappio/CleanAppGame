@@ -1,0 +1,82 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
+// Get the width and height of the screen
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
+const ImageCategorizationGame = () => {
+  // Keep track of the current image, the user's score, and the countdown timer
+  const [currentImage, setCurrentImage] = useState(null);
+  const [score, setScore] = useState(0);
+  const [countdown, setCountdown] = useState(3);
+
+  // This function is called when the user categorizes an image
+  const categorizeImage = (category) => {
+    // Check if the user's categorization is correct using TensorFlow and PyTorch
+    if (category === currentImage.correctCategory) {
+      // Determine the score multiplier based on the remaining time
+      let multiplier = 1;
+      if (countdown === 1) {
+        multiplier = 3;
+      } else if (countdown === 2) {
+        multiplier = 2;
+      }
+
+      // Increment the score by the appropriate amount
+      setScore(score + multiplier);
+    }
+
+    // Load the next image and reset the countdown timer
+    setCurrentImage(getNextImage());
+    setCountdown(3);
+  };
+
+  // This function is used to load the next image from a database or API
+  const getNextImage = () => {
+    return {
+      imageUrl: 'https://example.com/image.jpg',
+      correctCategory: 'metal'
+    };
+  };
+
+  // This useEffect hook is used to update the countdown timer every second
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Decrement the countdown timer by 1 every second
+      setCountdown(countdown - 1);
+
+      // If the countdown timer reaches 0, load the next image and reset the timer
+      if (countdown === 0) {
+        setCurrentImage(getNextImage());
+        setCountdown(3);
+      }
+    }, 1000);
+
+    // Clean up the timeout when the component unmounts
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
+  return (
+    <View style={styles.container}>
+      {/* Display the user's score */}
+      <Text style={styles.scoreText}>Score: {score}</Text>
+
+      {/* If there is a current image, display it */}
+      {currentImage && (
+        <Image
+          source={{ uri: currentImage.imageUrl }}
+          style={styles.image}
+          resizeMode="contain"
+        />
+      )}
+
+      {/* Display the countdown timer */}
+      <Text style={styles.timerText}>Time Remaining: {countdown}</Text>
+
+      {/*
+        This is the button container that holds the buttons
+        for the different image categories
+      */}
+      <View style={styles.buttonContainer}>
