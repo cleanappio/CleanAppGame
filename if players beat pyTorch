@@ -1,0 +1,73 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
+// Get the width and height of the screen
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
+const ImageCategorizationGame = () => {
+  // Keep track of the current image, the user's score, and the countdown timer
+  const [currentImage, setCurrentImage] = useState(null);
+  const [score, setScore] = useState(0);
+  const [countdown, setCountdown] = useState(3);
+
+  // This object is used to store information about each image in the database
+  const imageDatabase = {};
+
+  // This function is called when the user categorizes an image
+  const categorizeImage = (category) => {
+    // Check if the user's categorization is correct using TensorFlow and PyTorch
+    if (category === currentImage.correctCategory) {
+      // Determine the score multiplier based on the remaining time
+      let multiplier = 1;
+      if (countdown === 1) {
+        multiplier = 3;
+      } else if (countdown === 2) {
+        multiplier = 2;
+      }
+
+      // Increment the score by the appropriate amount
+      setScore(score + multiplier);
+
+      // Increment the correct classification count for the current image
+      imageDatabase[currentImage.id].correctClassifications++;
+    } else {
+      // Increment the total classification count for the current image
+      imageDatabase[currentImage.id].totalClassifications++;
+    }
+
+    // Calculate the percentage of correct classifications for the current image
+    const percentage =
+      (imageDatabase[currentImage.id].correctClassifications /
+        imageDatabase[currentImage.id].totalClassifications) *
+      100;
+
+    // Determine if the percentage of correct classifications is statistically significant
+    if (percentage > 95) {
+      // If the percentage of correct classifications is greater than 95%,
+      // update the correct category for the current image to match the majority of players
+      currentImage.correctCategory = category;
+    }
+
+    // Load the next image and reset the countdown timer
+    setCurrentImage(getNextImage());
+    setCountdown(3);
+  };
+
+  // This function is used to load the next image from a database or API
+  const getNextImage = () => {
+    // Load the next image and its information from the database
+    const nextImage = {
+      id: 1,
+      imageUrl: 'https://example.com/image.jpg',
+      correctCategory: 'metal'
+    };
+
+    // If this is the first time this image has been shown, add it to the database
+    if (!imageDatabase[nextImage.id]) {
+      imageDatabase[nextImage.id] = {
+        correctClassifications: 0,
+        totalClassifications: 0
+      };
+   
